@@ -2,21 +2,19 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class TestTablero {
+    public static void main(String[] args) {
+        String entrada = JOptionPane.showInputDialog("Nº de filas:");
+        int filas = Integer.parseInt(entrada);
 
-	public static void main(String[] args) {
-		Tablero t = new Tablero();
-		
-		JFrame app = new JFrame("Tablero");
-		
-		String entrada= JOptionPane.showInputDialog("Filas:");
-		int filas=Integer.parseInt(entrada);
+        entrada = JOptionPane.showInputDialog("Nº de columnas:");
+        int columnas = Integer.parseInt(entrada);
 
-		String salida=String.format("Has elegido %d filas", filas);
-        JOptionPane.showMessageDialog(null, salida);
+        Tablero t = new Tablero(filas, columnas);
 
-		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		app.setBounds(100, 100, 440, 470);
-		app.add(t);
-		app.setVisible(true);
-	}
+        JFrame app = new JFrame("Number Match");
+        app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        app.setSize(600, 600); // Tamaño de la ventana por defecto, se puede rezisear una vez creada
+        app.add(t);
+        app.setVisible(true);
+    }
 }
