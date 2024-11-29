@@ -64,13 +64,11 @@ public class Tablero extends JPanel {
 
                 // Dibujar número si la celda no está vacía, comparamos con 0 porque 0 no puede ser parte de los nº
                 if (tablero[i][j] > 0 && tablero[i][j] <= 9) {
-					g.setFont(new Font("Arial", Font.BOLD, 20)); // Configura la fuente para el texto.
-					// Dibuja el número centrado aproximadamente en la celda.
-					// `j * anchoCelda + anchoCelda / 2 - 5`: Aproximadamente el centro horizontal.
-					// `i * altoCelda + altoCelda / 2 + 5`: Aproximadamente el centro vertical.
-                    g.drawString(String.valueOf(tablero[i][j]),
-                            j * anchoCelda + anchoCelda / 2 - 4, 
-                            i * altoCelda + altoCelda / 2 + 4);// + y - 4 puestos a ojo para que quede mas bonito centrado
+			g.setFont(new Font("Arial", Font.BOLD, 20)); // Configura la fuente para el texto.
+			// Dibuja el número centrado aproximadamente en la celda.
+		    g.drawString(String.valueOf(tablero[i][j]),
+			    j * anchoCelda + anchoCelda / 2 - 4, 
+			    i * altoCelda + altoCelda / 2 + 4);// + y - 4 puestos a ojo para que quede mas bonito centrado
                 }
             }
         }
