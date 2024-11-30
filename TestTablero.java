@@ -5,6 +5,11 @@ public class TestTablero {
     public static void main(String[] args) {
         String entrada = JOptionPane.showInputDialog("Nº de filas:");
         int filas = Integer.parseInt(entrada);
+		while (filas < 3) {
+			JOptionPane.showMessageDialog(null,"El número de filas debe ser mayor o igual a 3");	
+			entrada = JOptionPane.showInputDialog("Nº de filas:");
+        	filas = Integer.parseInt(entrada);
+		}
 
         entrada = JOptionPane.showInputDialog("Nº de columnas:");
         int columnas = Integer.parseInt(entrada);
