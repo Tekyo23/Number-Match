@@ -34,9 +34,10 @@ public class Tablero extends JPanel {
 
     private void inicializarTablero() {
         Random random = new Random();
-        for (int i = 0; i < Math.min(filas, 3); i++) { // Esto SOLO INICIALIZA LAS PRIMERAS 3 FILAS, según el enunciado
+        for (int i = 0; i < Math.min(filas, 4); i++) { // Esto SOLO INICIALIZA LAS PRIMERAS 3 FILAS, según el enunciado
             for (int j = 0; j < columnas; j++) {
-                tablero[i][j] = random.nextInt(9) + 1; // Se asignan nunmeros random a cada celda del tablero
+                // tablero[i][j] = random.nextInt(9) + 1; // Se asignan nunmeros random a cada celda del tablero
+                tablero[i][j] = 9; 
             }
         }
     }
@@ -55,21 +56,24 @@ public class Tablero extends JPanel {
 
         boolean sonIguales = num1 == num2;
         boolean sumanDiez = num1 + num2 == 10;
-        boolean noHayNumerosEntre = validarJugada(f1, c1, f2, c2);
-
-        return (sonIguales || sumanDiez) && noHayNumerosEntre; // esto retorna una doble validación que es un booleano, true si se puede hacer la jugada y false si no.
+        if (sonIguales || sumanDiez) {
+            return validarJugada(f1, c1, f2, c2);
+        }
+        return false;
     }
 
     private boolean validarJugada(int f1, int c1, int f2, int c2) {
         if (f1 == f2) { // Si estamos en la fila columna para los dos numeros
             int inicio = Math.min(c1, c2) + 1; // Vemos cual es menor
             int fin = Math.max(c1, c2); // Vemos cual es mayor
+
             for (int i = inicio; i < fin; i++) { // Recorremos la matriz
                 if (tablero[f1][i] != 0) {
                     return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacio, retornamos false, la jugada fue errada
-
                 }
             }
+            this.puntuacion += 2*(fin-inicio);
+            return true;
         } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
             int inicio = Math.min(f1, f2) + 1; // pos lo mismo
             int fin = Math.max(f1, f2); // x2
@@ -79,6 +83,8 @@ public class Tablero extends JPanel {
 
                 }
             }
+            this.puntuacion += 2*(fin-inicio);
+            return true;
         } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
             int pasoFila = (f2 > f1) ? 1 : -1;
             int pasoColumna = (c2 > c1) ? 1 : -1;
@@ -88,10 +94,12 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
+            this.puntuacion += 4*(Math.abs(c2 - c1) - 1);
+            return true;
         } else {
+            this.vidas -= 1;
             return false; // No fue válida baja ninguna condición
         }
-        return true; // todo legal, jugada válida, no se debería llegar acá pero mejor esto que un crash
     }
 
     private void realizarJugada() {
@@ -176,11 +184,12 @@ public class Tablero extends JPanel {
 
                     if (jugada()) { // comprueba si la jugada es válida
                         realizarJugada();
+                        JOptionPane.showMessageDialog(null, "Bien. Puntuación: " + puntuacion);
                     } else {
                         Tablero.this.jugadaInvalida = true;
                         repaint(); // Pinta las celdas roj
                         vidas--; // resta una vida
-                        JOptionPane.showMessageDialog(null, "toca mejorar chaval.");
+                        JOptionPane.showMessageDialog(null, "Toca mejorar chaval. Vidas: " + vidas + " Puntuación: " + puntuacion);
                     }
 
                     // Reinicia las selecciones después de procesar TODA la jugada, aca null es válido SOLO por las validaciones que hacemos antes de != null
