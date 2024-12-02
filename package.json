@@ -1,6 +1,6 @@
 {
   "name": "number-match",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Recreación del juego Match Number. Práctica realizada para la asignatura de Introducción a la Programación",
   "main": "index.js",
   "scripts": {

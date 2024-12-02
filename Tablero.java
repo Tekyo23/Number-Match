@@ -34,10 +34,9 @@ public class Tablero extends JPanel {
 
     private void inicializarTablero() {
         Random random = new Random();
-        for (int i = 0; i < Math.min(filas, 4); i++) { // Esto SOLO INICIALIZA LAS PRIMERAS 3 FILAS, según el enunciado
+        for (int i = 0; i < Math.min(filas, 3); i++) { // Esto SOLO INICIALIZA LAS PRIMERAS 3 FILAS, según el enunciado
             for (int j = 0; j < columnas; j++) {
-                // tablero[i][j] = random.nextInt(9) + 1; // Se asignan nunmeros random a cada celda del tablero
-                tablero[i][j] = 9; 
+                tablero[i][j] = random.nextInt(9) + 1; // Se asignan nunmeros random a cada celda del tablero
             }
         }
     }
