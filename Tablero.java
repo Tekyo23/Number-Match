@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -20,16 +21,19 @@ public class Tablero extends JPanel {
     private int[] primeraSeleccion = null; // celdas en coordenadas [fila, columna]
     private int[] segundaSeleccion = null;
     private boolean jugadaInvalida = false;
+    private JLabel labelPuntuacion;
+    private JLabel labelVidas;
 
-    //Constructores
-    public Tablero(int filas, int columnas, int vidas) {
+    public Tablero(int filas, int columnas, int vidas, JLabel labelPuntuacion, JLabel labelVidas) {
         this.filas = filas;
         this.columnas = columnas;
-        this.tablero = new int[filas][columnas];
         this.vidas = vidas;
+        this.tablero = new int[filas][columnas];
+        this.labelPuntuacion = labelPuntuacion;
+        this.labelVidas = labelVidas;
         inicializarTablero();
-
         addMouseListener(new MouseHandler());
+        actualizarEtiquetas();
     }
 
     private void inicializarTablero() {
@@ -70,20 +74,28 @@ public class Tablero extends JPanel {
 
             for (int i = inicio; i < fin; i++) { // Recorremos la matriz
                 if (tablero[f1][i] != 0) {
+                    this.jugadaInvalida = true;
+                    vidas--;
+                    actualizarEtiquetas();
                     return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacio, retornamos false, la jugada fue errada
                 }
             }
             this.puntuacion += 2 * (fin - inicio);
+            actualizarEtiquetas();
             return true;
         } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
             int inicio = Math.min(f1, f2) + 1; // pos lo mismo
             int fin = Math.max(f1, f2); // x2
             for (int i = inicio; i < fin; i++) {
                 if (tablero[i][c1] != 0) {
-                    return false; // toca mejorar
+                    this.jugadaInvalida = true;
+                    vidas--;
+                    actualizarEtiquetas();
+                    return false;
                 }
             }
             this.puntuacion += 2 * (fin - inicio);
+            actualizarEtiquetas();
             return true;
         } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
             int pasoFila = (f2 > f1) ? 1 : -1;
@@ -91,13 +103,18 @@ public class Tablero extends JPanel {
 
             for (int i = 1; i < Math.abs(f1 - f2); i++) {
                 if (tablero[f1 + i * pasoFila][c1 + i * pasoColumna] != 0) {
+                    this.jugadaInvalida = true;
+                    vidas--;
+                    actualizarEtiquetas();
                     return false;
                 }
             }
             this.puntuacion += 4 * (Math.abs(c2 - c1) - 1);
+            actualizarEtiquetas();
             return true;
         } else {
             this.vidas -= 1;
+            actualizarEtiquetas();
             return false; // No fue válida baja ninguna condición
         }
     }
@@ -114,93 +131,94 @@ public class Tablero extends JPanel {
         // Hasta acá todo ok, el prox problema sería validar que haya jugadas posibles o sugerirle directamente al jugador que agregue filas
     }
 
+    private void actualizarEtiquetas() {
+        labelPuntuacion.setText("Puntuación: " + this.puntuacion);
+        labelPuntuacion.setFont(new Font("Arial", Font.BOLD, 16));
+        labelPuntuacion.setForeground(new Color(34, 139, 34)); // Verde oscuro
+    
+        labelVidas.setText("Vidas: " + this.vidas);
+        labelVidas.setFont(new Font("Arial", Font.BOLD, 16));
+        labelVidas.setForeground(vidas > 1 ? Color.BLACK : Color.RED); // Rojo si queda una vida
+    }
+
     //Métodos de la clase que implementan el juego: básicamente hacer una
     //jugada, dibujar el estado del tablero y comprobar si la partida se acabó
     //Método paint
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // El ancho se obtiene dividiendo el ancho total del tablero (VENTANA) por el número de columnas.
+    
         int anchoCelda = getWidth() / columnas;
-        // La altura se calcula dividiendo el alto total del tablero (VENTANA) por el número de filas.
         int altoCelda = getHeight() / filas;
-
-        // Dibujar las celdas y sus números
+    
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                // fondo de la celda
+                // Color de la celda según su estado
                 if (primeraSeleccion != null && primeraSeleccion[0] == i && primeraSeleccion[1] == j) {
-                    g.setColor(new Color(144, 238, 144)); // Verde claro para la primera selección
+                    g.setColor(new Color(144, 238, 144)); // Verde claro para primera selección
                 } else if (segundaSeleccion != null && segundaSeleccion[0] == i && segundaSeleccion[1] == j) {
-                    if (this.jugadaInvalida) {
-                        g.setColor(Color.RED); // Rojo para una jugada inválida
-                    } else {
-                        g.setColor(new Color(144, 238, 144)); // Verde claro para la segunda selección
-                    }
+                    g.setColor(jugadaInvalida ? Color.RED : new Color(144, 238, 144)); // Rojo o verde para segunda selección
                 } else {
-                    g.setColor(Color.LIGHT_GRAY); // Color por defecto para las demás celdas
+                    g.setColor(Color.LIGHT_GRAY); // Gris claro para celdas inactivas
                 }
-
-                g.fillRect(j * anchoCelda, i * altoCelda, anchoCelda, altoCelda);
-
-                // borde de la celda.
-                g.setColor(Color.BLACK);
-
+    
+                g.fillRect(j * anchoCelda, i * altoCelda, anchoCelda, altoCelda); // Rellenar celda
+    
+                g.setColor(Color.BLACK); // Borde negro
                 g.drawRect(j * anchoCelda, i * altoCelda, anchoCelda, altoCelda);
-
-                // Dibujar número si la celda no está vacía, comparamos con 0 porque 0 no puede ser parte de los nº
-                if (tablero[i][j] > 0 && tablero[i][j] <= 9) {
-                    g.setFont(new Font("Arial", Font.BOLD, 26)); // fuente para el texto.
-                    // Dibuja el número "centrado" aproximadamente en la celda.
-                    g.drawString(String.valueOf(tablero[i][j]),
-                            j * anchoCelda + anchoCelda / 2 - 4,
-                            i * altoCelda + altoCelda / 2 + 4); // + y - 4 puestos a ojo para que quede más bonito centrado
+    
+                // Dibujar el número
+                if (tablero[i][j] > 0) {
+                    g.setFont(new Font("Arial", Font.BOLD, 24)); // Fuente grande
+                    g.setColor(Color.DARK_GRAY); // Número en gris oscuro
+                    String numero = String.valueOf(tablero[i][j]);
+                    int x = j * anchoCelda + anchoCelda / 2 - g.getFontMetrics().stringWidth(numero) / 2;
+                    int y = i * altoCelda + altoCelda / 2 + g.getFontMetrics().getHeight() / 3;
+                    g.drawString(numero, x, y);
                 }
             }
         }
-
     }
+    
 
     //Clase privada para capturar los eventos del ratón
     private class MouseHandler extends MouseAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
-            int anchoCelda = getWidth() / columnas; // el ancho de cada celda
-            int altoCelda = getHeight() / filas; // la altura de cada celda
-            int columna = e.getX() / anchoCelda; // columna donde se hizo clic
-            int fila = e.getY() / altoCelda; // fila donde se hizo clic
-
-            if (fila >= 0 && fila < filas && columna >= 0 && columna < columnas) { // Check para clicks válidos en casillas que NO estén vacias
+            int anchoCelda = getWidth() / columnas;
+            int altoCelda = getHeight() / filas;
+    
+            int columna = e.getX() / anchoCelda;
+            int fila = e.getY() / altoCelda;
+    
+            if (fila >= 0 && fila < filas && columna >= 0 && columna < columnas) {
                 if (tablero[fila][columna] == 0) {
-                    JOptionPane.showMessageDialog(null, "Lo de leer instrucciones no es lo tuyo.");
+                    JOptionPane.showMessageDialog(null, "Selecciona una casilla válida.");
                     return;
                 }
-
+    
                 if (primeraSeleccion == null) {
-                    primeraSeleccion = new int[]{fila, columna}; // guarda la primera selección
+                    primeraSeleccion = new int[]{fila, columna};
                 } else if (segundaSeleccion == null) {
-                    segundaSeleccion = new int[]{fila, columna}; // guarda la segunda selección
-                    repaint(); // actualiza la visualización antes de evaluar la jugada
-
-                    if (jugada()) { // comprueba si la jugada es válida
+                    segundaSeleccion = new int[]{fila, columna};
+                    repaint(); // Refrescar visual antes de evaluar
+    
+                    if (jugada()) {
                         realizarJugada();
-                        JOptionPane.showMessageDialog(null, "Bien. Puntuación: " + puntuacion);
+                        JOptionPane.showMessageDialog(null, "Jugada válida. ¡Sigue así!");
                     } else {
-                        Tablero.this.jugadaInvalida = true;
-                        repaint(); // Pinta las celdas roj
-                        vidas--; // resta una vida
-                        JOptionPane.showMessageDialog(null, "Toca mejorar chaval. Vidas: " + vidas + " Puntuación: " + puntuacion);
+                        JOptionPane.showMessageDialog(null, "Jugada inválida. Pierdes una vida.");
                     }
-
-                    // Reinicia las selecciones después de procesar TODA la jugada, aca null es válido SOLO por las validaciones que hacemos antes de != null
+    
+                    // Reiniciar selecciones
                     primeraSeleccion = null;
                     segundaSeleccion = null;
                     jugadaInvalida = false;
+                    actualizarEtiquetas();
                 }
-
-                repaint(); // reinstancia el tablero de nuevo con los valores actualizados
+                repaint(); // Refrescar tablero
             }
         }
     }
+    
 }
