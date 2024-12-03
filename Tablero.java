@@ -15,7 +15,7 @@ public class Tablero extends JPanel {
     private int[][] tablero; // Esta es la matriz que compone el tablero, no se si el nº de columnas debería ser 8 igual que la figura que nos pasó Juanjo
     private int filas;
     private int columnas;
-    private int vidas = 5; // Podemos cambiarlo, incluso darle la opción al jugador
+    private int vidas = 5; // Por defecto 5, el jugador puede elegir el nº
     private int puntuacion = 0;
     private int[] primeraSeleccion = null; // celdas en coordenadas [fila, columna]
     private int[] segundaSeleccion = null;
@@ -57,8 +57,10 @@ public class Tablero extends JPanel {
         boolean sumanDiez = num1 + num2 == 10;
         if (sonIguales || sumanDiez) {
             return validarJugada(f1, c1, f2, c2);
+        } else {
+            this.jugadaInvalida = true;
+            return false;
         }
-        return false;
     }
 
     private boolean validarJugada(int f1, int c1, int f2, int c2) {
@@ -71,7 +73,7 @@ public class Tablero extends JPanel {
                     return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacio, retornamos false, la jugada fue errada
                 }
             }
-            this.puntuacion += 2*(fin-inicio);
+            this.puntuacion += 2 * (fin - inicio);
             return true;
         } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
             int inicio = Math.min(f1, f2) + 1; // pos lo mismo
@@ -79,10 +81,9 @@ public class Tablero extends JPanel {
             for (int i = inicio; i < fin; i++) {
                 if (tablero[i][c1] != 0) {
                     return false; // toca mejorar
-
                 }
             }
-            this.puntuacion += 2*(fin-inicio);
+            this.puntuacion += 2 * (fin - inicio);
             return true;
         } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
             int pasoFila = (f2 > f1) ? 1 : -1;
@@ -93,7 +94,7 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += 4*(Math.abs(c2 - c1) - 1);
+            this.puntuacion += 4 * (Math.abs(c2 - c1) - 1);
             return true;
         } else {
             this.vidas -= 1;
@@ -131,7 +132,7 @@ public class Tablero extends JPanel {
                 if (primeraSeleccion != null && primeraSeleccion[0] == i && primeraSeleccion[1] == j) {
                     g.setColor(new Color(144, 238, 144)); // Verde claro para la primera selección
                 } else if (segundaSeleccion != null && segundaSeleccion[0] == i && segundaSeleccion[1] == j) {
-                    if (!jugada()) {
+                    if (this.jugadaInvalida) {
                         g.setColor(Color.RED); // Rojo para una jugada inválida
                     } else {
                         g.setColor(new Color(144, 238, 144)); // Verde claro para la segunda selección
@@ -162,6 +163,7 @@ public class Tablero extends JPanel {
 
     //Clase privada para capturar los eventos del ratón
     private class MouseHandler extends MouseAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             int anchoCelda = getWidth() / columnas; // el ancho de cada celda
@@ -194,6 +196,7 @@ public class Tablero extends JPanel {
                     // Reinicia las selecciones después de procesar TODA la jugada, aca null es válido SOLO por las validaciones que hacemos antes de != null
                     primeraSeleccion = null;
                     segundaSeleccion = null;
+                    jugadaInvalida = false;
                 }
 
                 repaint(); // reinstancia el tablero de nuevo con los valores actualizados

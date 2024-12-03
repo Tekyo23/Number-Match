@@ -10,11 +10,11 @@ public class TestTablero {
 			entrada = JOptionPane.showInputDialog("Nº de filas (>= 3):");
         	filas = Integer.parseInt(entrada);
 		}
-        entrada = JOptionPane.showInputDialog("Nº de vidas:");
-        int vidas = Integer.parseInt(entrada);
-
         entrada = JOptionPane.showInputDialog("Nº de columnas:");
         int columnas = Integer.parseInt(entrada);
+
+        entrada = JOptionPane.showInputDialog("Nº de vidas:");
+        int vidas = Integer.parseInt(entrada);
 
         Tablero t = new Tablero(filas, columnas, vidas);
 
