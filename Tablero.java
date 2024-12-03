@@ -22,11 +22,11 @@ public class Tablero extends JPanel {
     private boolean jugadaInvalida = false;
 
     //Constructores
-    public Tablero(int filas, int columnas) {
+    public Tablero(int filas, int columnas, int vidas) {
         this.filas = filas;
         this.columnas = columnas;
         this.tablero = new int[filas][columnas];
-
+        this.vidas = vidas;
         inicializarTablero();
 
         addMouseListener(new MouseHandler());
@@ -67,7 +67,6 @@ public class Tablero extends JPanel {
             for (int i = inicio; i < fin; i++) { // Recorremos la matriz
                 if (tablero[f1][i] != 0) {
                     return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacio, retornamos false, la jugada fue errada
-
                 }
             }
         } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
