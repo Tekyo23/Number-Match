@@ -8,7 +8,7 @@ public class TestTablero {
     public static void main(String[] args) {
         // ícono personalizado para los input
         ImageIcon iconoQ = new ImageIcon("Number-Match\\resources\\placeholder1.png");
-        Image iconoF = iconoQ.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH); // Redimensionar a 32x32
+        Image iconoF = iconoQ.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
         ImageIcon iconoRedimensionado = new ImageIcon(iconoF);
 
         // Establecer el ícono personalizado para los cuadros de diálogo

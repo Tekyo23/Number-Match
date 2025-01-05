@@ -12,8 +12,6 @@ import javax.swing.Timer;
 
 public class Tablero extends JPanel {
 
-    // Aquí irían los atributos necesarios
-    // 1er draft
     private final int[][] tablero; // Esta es la matriz que compone el tablero, no se si el nº de columnas debería
     // ser 8 igual que la figura que nos pasó Juanjo
     private final int filas;
@@ -26,7 +24,7 @@ public class Tablero extends JPanel {
     private final JLabel labelPuntuacion;
     private final JLabel labelVidas;
     private boolean[][] iluminadas; // Para saber qué celdas están iluminadas
-    
+
     public Tablero(int filas, int columnas, int vidas, JLabel labelPuntuacion, JLabel labelVidas) {
         this.filas = filas;
         this.columnas = columnas;
@@ -51,19 +49,19 @@ public class Tablero extends JPanel {
     private boolean jugada(boolean esSugerencia) {
         int f1 = primeraSeleccion[0], c1 = primeraSeleccion[1];
         int f2 = segundaSeleccion[0], c2 = segundaSeleccion[1];
-    
+
         if (f1 == f2 && c1 == c2) { // Estamos seleccionando LA MISMA CELDA dos veces
             return false;
         }
-    
+
         if (tablero[f1][c1] == 0 || tablero[f2][c2] == 0) {
             return false; // No se puede seleccionar casillas vacías
         }
-    
+
         // buscamos los valores en el tablero / mátriz
         int num1 = tablero[f1][c1];
         int num2 = tablero[f2][c2];
-    
+
         boolean sonIguales = num1 == num2;
         boolean sumanDiez = num1 + num2 == 10;
         if (sonIguales || sumanDiez) {
@@ -160,7 +158,7 @@ public class Tablero extends JPanel {
                         }
                         primeraSeleccion = new int[]{f1, c1};
                         segundaSeleccion = new int[]{f2, c2};
-    
+
                         if (jugada(true)) { // Ahora jugada no resta vidas en modo sugerencia
                             JOptionPane.showMessageDialog(this,
                                     "Sugerencia: Intenta combinar el " + tablero[f1][c1] + " y " + tablero[f2][c2] + ".");
@@ -173,16 +171,16 @@ public class Tablero extends JPanel {
                 }
             }
         }
-    
+
         JOptionPane.showMessageDialog(this, "No hay jugadas posibles en el tablero.");
         primeraSeleccion = null;
         segundaSeleccion = null;
     }
-    
+
     void sugerirTodasJugadas() {
-        String[] jugadasValidas = new String[filas * columnas * filas * columnas]; // Arreglo grande
+        String[] jugadasValidas = new String[filas * columnas * filas * columnas]; // Arreglo de tamaño máximo posible
         int contador = 0; // Contador de jugadas válidas
-    
+
         for (int f1 = 0; f1 < filas; f1++) {
             for (int c1 = 0; c1 < columnas; c1++) {
                 if (tablero[f1][c1] == 0) {
@@ -193,18 +191,18 @@ public class Tablero extends JPanel {
                         if ((f1 == f2 && c1 == c2) || tablero[f2][c2] == 0) {
                             continue; // Ignorar celdas vacías o la misma celda
                         }
-    
+
                         // Temporalmente marcamos las selecciones
                         primeraSeleccion = new int[]{f1, c1};
                         segundaSeleccion = new int[]{f2, c2};
-    
-                        // Llamamos a jugada en modo sugerencia
+
+                        // Llamamos a jugada en modo "sugerencia"
                         if (jugada(true)) {
-                            jugadasValidas[contador] = "Combina " + tablero[f1][c1] +
-                                    " con " + tablero[f2][c2];
+                            jugadasValidas[contador] = "Combina " + tablero[f1][c1]
+                                    + " con " + tablero[f2][c2];
                             contador++;
                         }
-    
+
                         // Limpiamos las selecciones para evitar interferencias
                         primeraSeleccion = null;
                         segundaSeleccion = null;
@@ -212,7 +210,7 @@ public class Tablero extends JPanel {
                 }
             }
         }
-    
+
         if (contador > 0) {
             String mensaje = "";
             for (int i = 0; i < contador; i++) {
@@ -223,25 +221,24 @@ public class Tablero extends JPanel {
             JOptionPane.showMessageDialog(this, "No hay jugadas posibles en el tablero.");
         }
     }
-    
 
     private void iluminarCeldas(int[] primera, int[] segunda) {
         // Inicializar el array iluminadas si es null
         if (iluminadas == null) {
             iluminadas = new boolean[filas][columnas]; // Matriz booleana para gestionar las celdas iluminadas
         }
-    
+
         // Marcamos las celdas a iluminar
         iluminadas[primera[0]][primera[1]] = true;
         iluminadas[segunda[0]][segunda[1]] = true;
 
         repaint();
-    
+
         // Timer para que se despinten en X segundos
         new Timer(3000, e -> {
             iluminadas[primera[0]][primera[1]] = false;
             iluminadas[segunda[0]][segunda[1]] = false;
-            repaint(); 
+            repaint();
         }).start();
     }
 
@@ -284,6 +281,7 @@ public class Tablero extends JPanel {
             }
         }
     }
+
     // Clase privada para capturar los eventos del ratón
     private class MouseHandler extends MouseAdapter {
 
