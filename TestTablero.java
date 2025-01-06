@@ -22,9 +22,19 @@ public class TestTablero {
         }
         entrada = JOptionPane.showInputDialog("Nº de columnas:");
         int columnas = Integer.parseInt(entrada);
+        while (columnas < 1) {
+            JOptionPane.showMessageDialog(null, "El número de columnas debe ser mayor que 0");
+            entrada = JOptionPane.showInputDialog("Nº de columnas:");
+            columnas = Integer.parseInt(entrada);
+        }
 
         entrada = JOptionPane.showInputDialog("Nº de vidas:");
         int vidas = Integer.parseInt(entrada);
+        while (vidas < 1) {
+            JOptionPane.showMessageDialog(null, "El número de vidas debe ser mayor que 0");
+            entrada = JOptionPane.showInputDialog("Nº de vidas:");
+            vidas = Integer.parseInt(entrada);
+        }
 
         JFrame app = new JFrame("Number Match");
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,6 +59,12 @@ public class TestTablero {
         configurarBotonComoIcono(botonAgregarNumeros);
         configurarBotonComoIcono(botonUnaJugada);
         configurarBotonComoIcono(botonTodasJugadas);
+        
+        botonAgregarNumeros.addActionListener(e -> {
+            if (t != null) { // Verificar que el tablero esté inicializado
+                t.AñadirFilas();
+            }
+        });
 
         botonUnaJugada.addActionListener(e -> {
             if (t != null) { // Verificar que el tablero esté inicializado

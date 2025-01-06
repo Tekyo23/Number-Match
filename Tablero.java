@@ -5,9 +5,11 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class Tablero extends JPanel {
@@ -49,7 +51,7 @@ public class Tablero extends JPanel {
     private boolean jugada(boolean esSugerencia) {
         int f1 = primeraSeleccion[0], c1 = primeraSeleccion[1];
         int f2 = segundaSeleccion[0], c2 = segundaSeleccion[1];
-
+        FinPartida();
         if (f1 == f2 && c1 == c2) { // Estamos seleccionando LA MISMA CELDA dos veces
             return false;
         }
@@ -116,7 +118,11 @@ public class Tablero extends JPanel {
             this.puntuacion += 4 * (Math.abs(c2 - c1) - 1);
             actualizarEtiquetas();
             return true;
-        } else {
+        } else if (c1 == 0 && (c2 + 1) == this.columnas && Math.abs(f1 - f2) == 1 || c2 == 0 && (c1 + 1) == this.columnas && Math.abs(f1 - f2) == 1) {
+            actualizarEtiquetas();
+            this.puntuacion += 4;
+            return true;}
+         else {
             actualizarEtiquetas();
             return false; // No fue válida baja ninguna condición
         }
@@ -130,7 +136,8 @@ public class Tablero extends JPanel {
         tablero[f2][c2] = 0;
 
         this.puntuacion += 1;
-
+        moverFilasHaciaAbajo();
+        FinPartida();
         // Hasta acá todo ok, el prox problema sería validar que haya jugadas posibles o
         // sugerirle directamente al jugador que agregue filas
     }
@@ -221,6 +228,47 @@ public class Tablero extends JPanel {
             JOptionPane.showMessageDialog(this, "No hay jugadas posibles en el tablero.");
         }
     }
+    void AñadirFilas() {
+        int[][] tableroNuevo = new int[filas][columnas];
+        int x = 0;
+        int y = 0;
+        int h = 0;
+        int filaDeCero = 0;
+        int filaEmpezar = 0;
+        boolean romper = false;
+        if (ComprobarQueNoEsteLleno()) {
+            for (int i = 0; i < filas; i++) {
+                filaDeCero = 0;
+                for (int j = 0; j < columnas; j++) {
+                    if (tablero[i][j] != 0) {
+                        tableroNuevo[x][y] = tablero[i][j];
+                        y++;
+                        if (y == columnas) {
+                            x++;
+                            y = 0;
+                        }
+                    } else {
+                        filaDeCero++;
+                        if (filaDeCero == columnas) {
+                            filaEmpezar = i;
+                            romper = true;
+                            break;
+                        }
+                    }
+                }
+                if (romper) {
+                    break;
+                }
+            }
+            for (int i = filaEmpezar; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    tablero[i][j] = tableroNuevo[h][j];
+                }
+                h++;
+            }
+        }
+    }
+
 
     private void iluminarCeldas(int[] primera, int[] segunda) {
         // Inicializar el array iluminadas si es null
@@ -241,7 +289,70 @@ public class Tablero extends JPanel {
             repaint();
         }).start();
     }
+    private boolean ComprobarQueNoEsteLleno() {
+        int filasCero = 0;
+        for (int i = 0; i < this.filas; i++) {
+            for (int j = 0; j < this.columnas; j++) {
+                if (tablero[i][j] == 0) {
+                    filasCero++;
+                    if (filasCero == columnas) {
+                        return true;
+                    }
+                }
+            }
+            filasCero = 0;
+        }
+        return false;
+    }
+    public void moverFilasHaciaAbajo() {
+        //Creamos un tablero igual que el original
+        int[][] nuevoTablero = new int[filas][columnas];
+        int nuevaFila = 0;
+        for (int i = 0; i < filas; i++) {
+            boolean esFilaDeCeros = true;
+            for (int j = 0; j < columnas; j++) {
+                if (tablero[i][j] != 0) {
+                    esFilaDeCeros = false;
+                    break;
+                }
+            }
+            //Si la fila no esta vacia la copiamos
+            if (!esFilaDeCeros) {
+                nuevoTablero[nuevaFila] = tablero[i];
+                nuevaFila++;
+            }
+        }
+        //Rellenamos las filas restantes en el nuevo tablero con ceros
+        for (int i = nuevaFila; i < filas; i++) {
+            nuevoTablero[i] = new int[columnas];
+        }
+        //copiamos el nuevo tablero al tablero original
+        for (int i = 0; i < filas; i++) {
+            tablero[i] = nuevoTablero[i];
+        }
+    }
 
+        private void FinPartida() {
+        if (this.vidas < 1) {
+            JOptionPane.showMessageDialog(this, "¡Has perdido!");
+            ((JFrame) SwingUtilities.getWindowAncestor(this)).dispose();
+        } else {
+            boolean tableroLLeno = true;
+            for (int i = 0; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    if (tablero[i][j] != 0) {
+                        tableroLLeno = false;
+                        break;
+                    }
+                }
+            }
+            if (tableroLLeno) {
+                JOptionPane.showMessageDialog(this, "¡Has ganado!");
+                ((JFrame) SwingUtilities.getWindowAncestor(this)).dispose();
+            }
+        }
+    }
+    
     // Métodos de la clase que implementan el juego: básicamente hacer una
     // jugada, dibujar el estado del tablero y comprobar si la partida se acabó
     // Método paint
