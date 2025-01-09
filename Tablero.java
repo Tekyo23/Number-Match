@@ -130,16 +130,14 @@ public class Tablero extends JPanel {
                     actualizarEtiquetas();
                     return false;
                 }
-                this.puntuacion += 4;
             }
             for (int j = 0; j < c2; j++) {
                 if (tablero[filaMayor][j] != 0) {
                     actualizarEtiquetas();
                     return false;
                 }
-                this.puntuacion += 4;
             }
-            this.puntuacion += 1;
+            this.puntuacion += ((this.columnas - (c1+1)) * 3) + (c2 * 3) + 1;
             actualizarEtiquetas();
             return true;
         } else {
