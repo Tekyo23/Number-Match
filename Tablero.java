@@ -156,8 +156,6 @@ public class Tablero extends JPanel {
         tablero[f1][c1] = 0;
         tablero[f2][c2] = 0;
 
-        moverFilasHaciaAbajo();
-        FinPartida();
         // Hasta acá todo ok, el prox problema sería validar que haya jugadas posibles o
         // sugerirle directamente al jugador que agregue filas
     }
@@ -439,8 +437,11 @@ public class Tablero extends JPanel {
                     if (jugada(false)) {
                         realizarJugada();
                         JOptionPane.showMessageDialog(null, "Jugada válida. ¡Sigue así!");
+                        moverFilasHaciaAbajo();
+                        FinPartida();
                     } else {
                         JOptionPane.showMessageDialog(null, "Jugada inválida. Pierdes una vida.");
+                        FinPartida();
                     }
 
                     // Reiniciar selecciones
