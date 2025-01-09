@@ -90,7 +90,7 @@ public class Tablero extends JPanel {
                     // false, la jugada fue errada
                 }
             }
-            this.puntuacion += 2 * (fin - inicio);
+            this.puntuacion += 2 * (fin - inicio) + 1;
             actualizarEtiquetas();
             return true;
         } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
@@ -102,7 +102,7 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += 2 * (fin - inicio);
+            this.puntuacion += 2 * (fin - inicio) + 1;
             actualizarEtiquetas();
             return true;
         } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
@@ -115,14 +115,35 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += 4 * (Math.abs(c2 - c1) - 1);
+            this.puntuacion += 4 * (Math.abs(c2 - c1) - 1) + 1;
             actualizarEtiquetas();
             return true;
-        } else if (c1 == 0 && (c2 + 1) == this.columnas && Math.abs(f1 - f2) == 1 || c2 == 0 && (c1 + 1) == this.columnas && Math.abs(f1 - f2) == 1) {
+        } else if (Math.abs(f1 - f2) == 1) {
+            int filaMenor = Math.min(f1, f2);
+            int filaMayor = Math.max(f1, f2);
+            if (filaMenor == f2) {
+                int hold = c1;
+                c1 = c2;
+                c2 = hold;
+            }
+            for (int i = c1 + 1; i < this.columnas; i++) {
+                if (tablero[filaMenor][i] != 0) {
+                    actualizarEtiquetas();
+                    return false;
+                }
+                this.puntuacion += 4;
+            }
+            for (int j = 0; j < c2; j++) {
+                if (tablero[filaMayor][j] != 0) {
+                    actualizarEtiquetas();
+                    return false;
+                }
+                this.puntuacion += 4;
+            }
+            this.puntuacion += 1;
             actualizarEtiquetas();
-            this.puntuacion += 4;
-            return true;}
-         else {
+            return true;
+        } else {
             actualizarEtiquetas();
             return false; // No fue válida baja ninguna condición
         }
@@ -135,7 +156,6 @@ public class Tablero extends JPanel {
         tablero[f1][c1] = 0;
         tablero[f2][c2] = 0;
 
-        this.puntuacion += 1;
         moverFilasHaciaAbajo();
         FinPartida();
         // Hasta acá todo ok, el prox problema sería validar que haya jugadas posibles o
