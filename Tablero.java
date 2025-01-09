@@ -51,7 +51,6 @@ public class Tablero extends JPanel {
     private boolean jugada(boolean esSugerencia) {
         int f1 = primeraSeleccion[0], c1 = primeraSeleccion[1];
         int f2 = segundaSeleccion[0], c2 = segundaSeleccion[1];
-        FinPartida();
         if (f1 == f2 && c1 == c2) { // Estamos seleccionando LA MISMA CELDA dos veces
             return false;
         }
