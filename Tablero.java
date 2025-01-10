@@ -50,105 +50,99 @@ public class Tablero extends JPanel {
     private boolean jugada(boolean esSugerencia) {
         int f1 = primeraSeleccion[0], c1 = primeraSeleccion[1];
         int f2 = segundaSeleccion[0], c2 = segundaSeleccion[1];
-        if (f1 == f2 && c1 == c2) { // Estamos seleccionando LA MISMA CELDA dos veces
+        if (tablero[f1][c1] == 0 || tablero[f2][c2] == 0) { // Estamos seleccionando LA MISMA CELDA dos veces
             return false;
-        }
-
-        if (tablero[f1][c1] == 0 || tablero[f2][c2] == 0) {
-            return false; // No se puede seleccionar casillas vacías
-        }
-
-        // buscamos los valores en el tablero / mátriz
-        int num1 = tablero[f1][c1];
-        int num2 = tablero[f2][c2];
-
-        boolean sonIguales = num1 == num2;
-        boolean sumanDiez = num1 + num2 == 10;
-        if (sonIguales || sumanDiez) {
-            return validarJugada(f1, c1, f2, c2, esSugerencia);
-        } else {
+        } else if ((f1 == f2 && c1 == c2) || !validarJugada(f1, c1, f2, c2, esSugerencia)) {
             this.jugadaInvalida = true;
             if (!esSugerencia) { // Solo se restan vidas si NO es una sugerencia
                 this.vidas--;
                 actualizarEtiquetas();
             }
             return false;
+        } else {
+            return true;
         }
     }
 
     private boolean validarJugada(int f1, int c1, int f2, int c2, boolean esSugerencia) {
-        if (f1 == f2) { // Si estamos en la fila columna para los dos numeros
-            int inicio = Math.min(c1, c2) + 1; // Vemos cual es menor
-            int fin = Math.max(c1, c2); // Vemos cual es mayor
-
-            for (int i = inicio; i < fin; i++) { // Recorremos la matriz
-                if (tablero[f1][i] != 0) {
-                    actualizarEtiquetas();
-                    return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacío, retornamos false, la jugada fue errada
+        int num1 = tablero[f1][c1];
+        int num2 = tablero[f2][c2];
+        boolean sonIguales = num1 == num2;
+        boolean sumanDiez = num1 + num2 == 10;
+        if (sonIguales || sumanDiez) {
+            if (f1 == f2) { // Si estamos en la fila columna para los dos numeros
+                int inicio = Math.min(c1, c2) + 1; // Vemos cual es menor
+                int fin = Math.max(c1, c2); // Vemos cual es mayor
+    
+                for (int i = inicio; i < fin; i++) { // Recorremos la matriz
+                    if (tablero[f1][i] != 0) {
+                        actualizarEtiquetas();
+                        return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacío, retornamos false, la jugada fue errada
+                    }
                 }
-            }
-            if (!esSugerencia) {
-                this.puntuacion += 2 * (fin - inicio) + 1;
-            }
-            actualizarEtiquetas();
-            return true;
-        } else if (c1 == c2) { // Si estamos en la misma columna para los dos números
-            int inicio = Math.min(f1, f2) + 1; // pos lo mismo
-            int fin = Math.max(f1, f2); // x2
-            for (int i = inicio; i < fin; i++) {
-                if (tablero[i][c1] != 0) {
-                    actualizarEtiquetas();
-                    return false;
+                if (!esSugerencia) {
+                    this.puntuacion += 2 * (fin - inicio) + 1;
                 }
-            }
-            if (!esSugerencia) {
-                this.puntuacion += 2 * (fin - inicio) + 1;
-            }
-            actualizarEtiquetas();
-            return true;
-        } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
-            int pasoFila = (f2 > f1) ? 1 : -1;
-            int pasoColumna = (c2 > c1) ? 1 : -1;
-
-            for (int i = 1; i < Math.abs(f1 - f2); i++) {
-                if (tablero[f1 + i * pasoFila][c1 + i * pasoColumna] != 0) {
-                    actualizarEtiquetas();
-                    return false;
+                actualizarEtiquetas();
+                return true;
+            } else if (c1 == c2) { // Si estamos en la misma columna para los dos números
+                int inicio = Math.min(f1, f2) + 1; // pos lo mismo
+                int fin = Math.max(f1, f2); // x2
+                for (int i = inicio; i < fin; i++) {
+                    if (tablero[i][c1] != 0) {
+                        actualizarEtiquetas();
+                        return false;
+                    }
                 }
-            }
-            if (!esSugerencia) {
-                this.puntuacion += 4 * (Math.abs(c2 - c1) - 1) + 1;
-            }
-            actualizarEtiquetas();
-            return true;
-        } else if (Math.abs(f1 - f2) == 1) {
-            int filaMenor = Math.min(f1, f2);
-            int filaMayor = Math.max(f1, f2);
-            if (filaMenor == f2) {
-                int hold = c1;
-                c1 = c2;
-                c2 = hold;
-            }
-            for (int i = c1 + 1; i < this.columnas; i++) {
-                if (tablero[filaMenor][i] != 0) {
-                    actualizarEtiquetas();
-                    return false;
+                if (!esSugerencia) {
+                    this.puntuacion += 2 * (fin - inicio) + 1;
                 }
-            }
-            for (int j = 0; j < c2; j++) {
-                if (tablero[filaMayor][j] != 0) {
-                    actualizarEtiquetas();
-                    return false;
+                actualizarEtiquetas();
+                return true;
+            } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
+                int pasoFila = (f2 > f1) ? 1 : -1;
+                int pasoColumna = (c2 > c1) ? 1 : -1;
+    
+                for (int i = 1; i < Math.abs(f1 - f2); i++) {
+                    if (tablero[f1 + i * pasoFila][c1 + i * pasoColumna] != 0) {
+                        actualizarEtiquetas();
+                        return false;
+                    }
                 }
+                if (!esSugerencia) {
+                    this.puntuacion += 4 * (Math.abs(c2 - c1) - 1) + 1;
+                }
+                actualizarEtiquetas();
+                return true;
+            } else {
+                int filaMenor = Math.min(f1, f2);
+                int filaMayor = Math.max(f1, f2);
+                if (filaMenor == f2) {
+                    int hold = c1;
+                    c1 = c2;
+                    c2 = hold;
+                }
+                for (int i = c1 + 1; i < this.columnas; i++) {
+                    if (tablero[filaMenor][i] != 0) {
+                        actualizarEtiquetas();
+                        return false;
+                    }
+                }
+                for (int j = 0; j < c2; j++) {
+                    if (tablero[filaMayor][j] != 0) {
+                        actualizarEtiquetas();
+                        return false;
+                    }
+                }
+                if (!esSugerencia) {
+                    this.puntuacion += ((this.columnas - (c1 + 1)) * 3) + (c2 * 3) + 1;
+                }
+                actualizarEtiquetas();
+                return true;
             }
-            if (!esSugerencia) {
-                this.puntuacion += ((this.columnas - (c1 + 1)) * 3) + (c2 * 3) + 1;
-            }
-            actualizarEtiquetas();
-            return true;
         } else {
             actualizarEtiquetas();
-            return false; // No fue válida bajo ninguna condición
+            return false;
         }
     }
 
