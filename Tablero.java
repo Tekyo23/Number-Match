@@ -66,7 +66,7 @@ public class Tablero extends JPanel {
         boolean sonIguales = num1 == num2;
         boolean sumanDiez = num1 + num2 == 10;
         if (sonIguales || sumanDiez) {
-            return validarJugada(f1, c1, f2, c2);
+            return validarJugada(f1, c1, f2, c2, esSugerencia);
         } else {
             this.jugadaInvalida = true;
             if (!esSugerencia) { // Solo se restan vidas si NO es una sugerencia
@@ -77,7 +77,7 @@ public class Tablero extends JPanel {
         }
     }
 
-    private boolean validarJugada(int f1, int c1, int f2, int c2) {
+    private boolean validarJugada(int f1, int c1, int f2, int c2, boolean esSugerencia) {
         if (f1 == f2) { // Si estamos en la fila columna para los dos numeros
             int inicio = Math.min(c1, c2) + 1; // Vemos cual es menor
             int fin = Math.max(c1, c2); // Vemos cual es mayor
@@ -85,14 +85,15 @@ public class Tablero extends JPanel {
             for (int i = inicio; i < fin; i++) { // Recorremos la matriz
                 if (tablero[f1][i] != 0) {
                     actualizarEtiquetas();
-                    return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacio, retornamos
-                    // false, la jugada fue errada
+                    return false; // Si CUALQUIERA de los valores no es 0, es decir, no está vacío, retornamos false, la jugada fue errada
                 }
             }
-            this.puntuacion += 2 * (fin - inicio) + 1;
+            if (!esSugerencia) {
+                this.puntuacion += 2 * (fin - inicio) + 1;
+            }
             actualizarEtiquetas();
             return true;
-        } else if (c1 == c2) { // Si estamos en la misma columna para los dos numeros
+        } else if (c1 == c2) { // Si estamos en la misma columna para los dos números
             int inicio = Math.min(f1, f2) + 1; // pos lo mismo
             int fin = Math.max(f1, f2); // x2
             for (int i = inicio; i < fin; i++) {
@@ -101,7 +102,9 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += 2 * (fin - inicio) + 1;
+            if (!esSugerencia) {
+                this.puntuacion += 2 * (fin - inicio) + 1;
+            }
             actualizarEtiquetas();
             return true;
         } else if (Math.abs(f1 - f2) == Math.abs(c1 - c2)) { // Diagonal, para que Sergio no llore tanto
@@ -114,7 +117,9 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += 4 * (Math.abs(c2 - c1) - 1) + 1;
+            if (!esSugerencia) {
+                this.puntuacion += 4 * (Math.abs(c2 - c1) - 1) + 1;
+            }
             actualizarEtiquetas();
             return true;
         } else if (Math.abs(f1 - f2) == 1) {
@@ -137,12 +142,14 @@ public class Tablero extends JPanel {
                     return false;
                 }
             }
-            this.puntuacion += ((this.columnas - (c1+1)) * 3) + (c2 * 3) + 1;
+            if (!esSugerencia) {
+                this.puntuacion += ((this.columnas - (c1 + 1)) * 3) + (c2 * 3) + 1;
+            }
             actualizarEtiquetas();
             return true;
         } else {
             actualizarEtiquetas();
-            return false; // No fue válida baja ninguna condición
+            return false; // No fue válida bajo ninguna condición
         }
     }
 
@@ -152,9 +159,6 @@ public class Tablero extends JPanel {
 
         tablero[f1][c1] = 0;
         tablero[f2][c2] = 0;
-
-        // Hasta acá todo ok, el prox problema sería validar que haya jugadas posibles o
-        // sugerirle directamente al jugador que agregue filas
     }
 
     private void actualizarEtiquetas() {
@@ -243,47 +247,69 @@ public class Tablero extends JPanel {
             JOptionPane.showMessageDialog(this, "No hay jugadas posibles en el tablero.");
         }
     }
-    void AñadirFilas() {
-        int[][] tableroNuevo = new int[filas][columnas];
-        int x = 0;
-        int y = 0;
-        int h = 0;
-        int filaDeCero = 0;
-        int filaEmpezar = 0;
-        boolean romper = false;
-        if (ComprobarQueNoEsteLleno()) {
-            for (int i = 0; i < filas; i++) {
-                filaDeCero = 0;
-                for (int j = 0; j < columnas; j++) {
-                    if (tablero[i][j] != 0) {
-                        tableroNuevo[x][y] = tablero[i][j];
-                        y++;
-                        if (y == columnas) {
-                            x++;
-                            y = 0;
-                        }
-                    } else {
-                        filaDeCero++;
-                        if (filaDeCero == columnas) {
-                            filaEmpezar = i;
-                            romper = true;
-                            break;
-                        }
-                    }
+
+    private boolean contieneNumero(int[] arreglo, int longitud, int numero) { // privada porque solo se usa en contexto de otras funciones de la clase
+        for (int i = 0; i < longitud; i++) {
+            if (arreglo[i] == numero) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int[] ObtenerNumerosExistentes() { // privada porque solo se usa en contexto de otras funciones de la clase
+        int[] numerosTemp = new int[filas * columnas];
+        int contador = 0;
+
+        // Recorrer el tablero y recopilar números únicos
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                int numero = tablero[i][j];
+                if (numero != 0 && !contieneNumero(numerosTemp, contador, numero)) {
+                    numerosTemp[contador++] = numero;
                 }
-                if (romper) {
+            }
+        }
+
+        // Copiar los números únicos a un arreglo del tamaño adecuado
+        int[] numeros = new int[contador];
+        System.arraycopy(numerosTemp, 0, numeros, 0, contador);
+
+        return numeros;
+    }
+
+    public void AñadirFilas() {
+        if (!ComprobarQueNoEsteLleno()) {
+            JOptionPane.showMessageDialog(this, "El tablero está lleno. No se pueden añadir más filas.");
+            return;
+        }
+
+        // Generar una nueva fila basada en combinaciones de los números existentes
+        int[] nuevaFila = new int[columnas];
+        Random random = new Random();
+        int[] numerosExistentes = ObtenerNumerosExistentes();
+
+        for (int j = 0; j < columnas; j++) {
+            nuevaFila[j] = numerosExistentes[random.nextInt(numerosExistentes.length)];
+        }
+
+        // Buscar la primera fila vacía para colocar la nueva fila
+        for (int i = 0; i < filas; i++) {
+            boolean filaVacia = true;
+            for (int j = 0; j < columnas; j++) {
+                if (tablero[i][j] != 0) {
+                    filaVacia = false;
                     break;
                 }
             }
-            for (int i = filaEmpezar; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    tablero[i][j] = tableroNuevo[h][j];
-                }
-                h++;
+
+            if (filaVacia) {
+                tablero[i] = nuevaFila;
+                repaint();
+                return;
             }
         }
     }
-
 
     private void iluminarCeldas(int[] primera, int[] segunda) {
         // Inicializar el array iluminadas si es null
@@ -304,6 +330,7 @@ public class Tablero extends JPanel {
             repaint();
         }).start();
     }
+
     private boolean ComprobarQueNoEsteLleno() {
         int filasCero = 0;
         for (int i = 0; i < this.filas; i++) {
@@ -319,6 +346,7 @@ public class Tablero extends JPanel {
         }
         return false;
     }
+
     public void moverFilasHaciaAbajo() {
         //Creamos un tablero igual que el original
         int[][] nuevoTablero = new int[filas][columnas];
@@ -347,7 +375,7 @@ public class Tablero extends JPanel {
         }
     }
 
-        private void FinPartida() {
+    private void FinPartida() {
         if (this.vidas < 1) {
             JOptionPane.showMessageDialog(this, "¡Has perdido!");
             ((JFrame) SwingUtilities.getWindowAncestor(this)).dispose();
@@ -367,7 +395,7 @@ public class Tablero extends JPanel {
             }
         }
     }
-    
+
     // Métodos de la clase que implementan el juego: básicamente hacer una
     // jugada, dibujar el estado del tablero y comprobar si la partida se acabó
     // Método paint

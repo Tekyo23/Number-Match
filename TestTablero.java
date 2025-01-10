@@ -63,6 +63,7 @@ public class TestTablero {
         botonAgregarNumeros.addActionListener(e -> {
             if (t != null) { // Verificar que el tablero esté inicializado
                 t.AñadirFilas();
+                t.repaint(); // Redibuja el tablero
             }
         });
 
