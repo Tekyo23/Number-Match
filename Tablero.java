@@ -10,7 +10,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 public class Tablero extends JPanel {
 
@@ -186,11 +185,13 @@ public class Tablero extends JPanel {
                         segundaSeleccion = new int[]{f2, c2};
 
                         if (jugada(true)) { // Ahora jugada no resta vidas en modo sugerencia
+                            iluminarCeldas(new int[]{f1, c1}, new int[]{f2, c2}, false);
                             JOptionPane.showMessageDialog(this,
                                     "Sugerencia: Intenta combinar el " + tablero[f1][c1] + " y " + tablero[f2][c2] + ".");
-                            iluminarCeldas(new int[]{f1, c1}, new int[]{f2, c2});
+                            iluminarCeldas(new int[]{f1, c1}, new int[]{f2, c2}, true);
                             primeraSeleccion = null;
                             segundaSeleccion = null;
+                            jugadaInvalida = false;
                             return;
                         }
                     }
@@ -311,7 +312,7 @@ public class Tablero extends JPanel {
         }
     }
 
-    private void iluminarCeldas(int[] primera, int[] segunda) {
+    private void iluminarCeldas(int[] primera, int[] segunda, boolean apagarCeldas) {
         // Inicializar el array iluminadas si es null
         if (iluminadas == null) {
             iluminadas = new boolean[filas][columnas]; // Matriz booleana para gestionar las celdas iluminadas
@@ -323,12 +324,10 @@ public class Tablero extends JPanel {
 
         repaint();
 
-        // Timer para que se despinten en X segundos
-        new Timer(3000, e -> {
+        if (apagarCeldas == true) {
             iluminadas[primera[0]][primera[1]] = false;
             iluminadas[segunda[0]][segunda[1]] = false;
-            repaint();
-        }).start();
+        }
     }
 
     private boolean ComprobarQueNoEsteLleno() {
