@@ -243,65 +243,43 @@ public class Tablero extends JPanel {
         }
     }
 
-    private boolean contieneNumero(int[] arreglo, int longitud, int numero) { // privada porque solo se usa en contexto de otras funciones de la clase
-        for (int i = 0; i < longitud; i++) {
-            if (arreglo[i] == numero) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int[] ObtenerNumerosExistentes() { // privada porque solo se usa en contexto de otras funciones de la clase
-        int[] numerosTemp = new int[filas * columnas];
-        int contador = 0;
-
-        // Recorrer el tablero y recopilar números únicos
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                int numero = tablero[i][j];
-                if (numero != 0 && !contieneNumero(numerosTemp, contador, numero)) {
-                    numerosTemp[contador++] = numero;
-                }
-            }
-        }
-
-        // Copiar los números únicos a un arreglo del tamaño adecuado
-        int[] numeros = new int[contador];
-        System.arraycopy(numerosTemp, 0, numeros, 0, contador);
-
-        return numeros;
-    }
-
     public void AñadirFilas() {
-        if (!ComprobarQueNoEsteLleno()) {
-            JOptionPane.showMessageDialog(this, "El tablero está lleno. No se pueden añadir más filas.");
-            return;
-        }
-
-        // Generar una nueva fila basada en combinaciones de los números existentes
-        int[] nuevaFila = new int[columnas];
-        Random random = new Random();
-        int[] numerosExistentes = ObtenerNumerosExistentes();
-
-        for (int j = 0; j < columnas; j++) {
-            nuevaFila[j] = numerosExistentes[random.nextInt(numerosExistentes.length)];
-        }
-
-        // Buscar la primera fila vacía para colocar la nueva fila
-        for (int i = 0; i < filas; i++) {
-            boolean filaVacia = true;
-            for (int j = 0; j < columnas; j++) {
-                if (tablero[i][j] != 0) {
-                    filaVacia = false;
+        int[][] tableroNuevo = new int[filas][columnas];
+        int x = 0;
+        int y = 0;
+        int h = 0;
+        int filaDeCero = 0;
+        int filaEmpezar = 0;
+        boolean romper = false;
+        if (ComprobarQueNoEsteLleno()) {
+            for (int i = 0; i < filas; i++) {
+                filaDeCero = 0;
+                for (int j = 0; j < columnas; j++) {
+                    if (tablero[i][j] != 0) {
+                        tableroNuevo[x][y] = tablero[i][j];
+                        y++;
+                        if (y == columnas) {
+                            x++;
+                            y = 0;
+                        }
+                    } else {
+                        filaDeCero++;
+                        if (filaDeCero == columnas) {
+                            filaEmpezar = i;
+                            romper = true;
+                            break;
+                        }
+                    }
+                }
+                if (romper) {
                     break;
                 }
             }
-
-            if (filaVacia) {
-                tablero[i] = nuevaFila;
-                repaint();
-                return;
+            for (int i = filaEmpezar; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    tablero[i][j] = tableroNuevo[h][j];
+                }
+                h++;
             }
         }
     }
