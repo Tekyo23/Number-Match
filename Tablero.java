@@ -1,3 +1,9 @@
+/**
+ * @author Sergio Lombao
+ * @author Julián Lechuga
+ * @author Raúl Rodríguez
+ * @version 1.0
+ */
 
 import java.awt.Color;
 import java.awt.Font;
