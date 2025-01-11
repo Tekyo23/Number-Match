@@ -7,7 +7,7 @@ public class TestTablero {
 
     public static void main(String[] args) {
         // ícono personalizado para los input
-        ImageIcon iconoQ = new ImageIcon("resources\\placeholder1.png");
+        ImageIcon iconoQ = new ImageIcon("resources/placeholder1.png");
         Image iconoF = iconoQ.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
         ImageIcon iconoRedimensionado = new ImageIcon(iconoF);
 
@@ -42,9 +42,9 @@ public class TestTablero {
         app.setLayout(new BorderLayout());
 
         // Cargar imágenes
-        ImageIcon unaJugada = new ImageIcon("resources\\1jugada.png");
-        ImageIcon todasJugadas = new ImageIcon("resources\\todasJugadas.png");
-        ImageIcon agregarNumeros = new ImageIcon("resources\\agregarNumeros.png");
+        ImageIcon unaJugada = new ImageIcon("resources/1jugada.png");
+        ImageIcon todasJugadas = new ImageIcon("resources/todasJugadas.png");
+        ImageIcon agregarNumeros = new ImageIcon("resources/agregarNumeros.png");
         Image unaJugadaImagen = unaJugada.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
         ImageIcon unaJugadaRedimensionada = new ImageIcon(unaJugadaImagen);
         Image imagenTodasJugadas = todasJugadas.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
@@ -105,7 +105,7 @@ public class TestTablero {
         app.add(panelInfo, BorderLayout.NORTH);
 
         // Icono de la app
-        ImageIcon icono = new ImageIcon("resources\\numberMatch.png");
+        ImageIcon icono = new ImageIcon("resources/numberMatch.png");
         app.setIconImage(icono.getImage());
 
         // Inicializar el tablero y asignarlo a la variable estática
